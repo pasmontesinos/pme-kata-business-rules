@@ -13,7 +13,7 @@ class OrderTest {
         order.pay()
 
         val expectedPackingSlips = listOf(PackingSlip(PackingSlipType.SHIPMENT))
-        assertEquals(expectedPackingSlips, order.packingSlips)
+        assertEquals(expectedPackingSlips, order.getPackingSlips())
     }
 
     @Test
@@ -27,17 +27,17 @@ class OrderTest {
             PackingSlip(PackingSlipType.SHIPMENT),
             PackingSlip(PackingSlipType.ROYALTY),
         )
-        assertEquals(expectedPackingSlips, order.packingSlips)
+        assertEquals(expectedPackingSlips, order.getPackingSlips())
     }
 
     @Test
-    fun `payment for a membership should activate the membership`(){
+    fun `payment for a membership should activate the membership`() {
         val customer = Customer(Id.random())
         val order = Order(Id.random(), customer, Product(Id.random(), ProductType.MEMBERSHIP))
 
         order.pay()
 
-        assertTrue(order.packingSlips.isEmpty())
+        assertTrue(order.getPackingSlips().isEmpty())
         assertTrue(customer.isMember())
     }
 

@@ -2,24 +2,47 @@ package mo.staff
 
 
 class Order(val id: Id, val customer: Customer, val product: Product) {
-    val packingSlips: MutableList<PackingSlip> = mutableListOf()
+    private val packingSlips: MutableList<PackingSlip> = mutableListOf()
+
+    fun getPackingSlips(): List<PackingSlip> = packingSlips.toList()
 
     fun pay() {
-        if (product.type == ProductType.PHYSICAL) {
-            this.packingSlips.add(PackingSlip(PackingSlipType.SHIPMENT))
-            return
+        val productPayProcessor = when (product.type) {
+            ProductType.PHYSICAL -> PhysicalProductTypePayProcessor()
+            ProductType.BOOK -> BookProductTypePayProcessor()
+            ProductType.MEMBERSHIP -> MembershipProductTypePayProcessor()
         }
-
-        if (product.type == ProductType.BOOK) {
-            this.packingSlips.add(PackingSlip(PackingSlipType.SHIPMENT))
-            this.packingSlips.add(PackingSlip(PackingSlipType.ROYALTY))
-            return
-        }
-
-        if (product.type == ProductType.MEMBERSHIP) {
-            customer.activateMembership()
-            return
-        }
+        productPayProcessor.process(this)
     }
 
+    internal fun addPackingSlip(packingSlipType: PackingSlipType) {
+        packingSlips.add(PackingSlip(packingSlipType))
+    }
+
+    internal fun activateCustomerMembership() {
+        customer.activateMembership()
+    }
+}
+
+interface ProductTypePayProcessor {
+    fun process(order: Order)
+}
+
+class PhysicalProductTypePayProcessor : ProductTypePayProcessor {
+    override fun process(order: Order) {
+        order.addPackingSlip(PackingSlipType.SHIPMENT)
+    }
+}
+
+class BookProductTypePayProcessor : ProductTypePayProcessor {
+    override fun process(order: Order) {
+        order.addPackingSlip(PackingSlipType.SHIPMENT)
+        order.addPackingSlip(PackingSlipType.ROYALTY)
+    }
+}
+
+class MembershipProductTypePayProcessor : ProductTypePayProcessor {
+    override fun process(order: Order) {
+        order.activateCustomerMembership()
+    }
 }
