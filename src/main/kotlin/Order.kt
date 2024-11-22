@@ -2,13 +2,13 @@ package mo.staff
 
 
 class Order(val id: Id, val product: Product) {
-    var packingSlip: PackingSlip? = null
-        get() = field
+    val packingSlips: MutableList<PackingSlip> = mutableListOf()
 
     fun pay() {
-        this.packingSlip = PackingSlip(PackingSlipType.SHIPMENT)
-
-
+        this.packingSlips.add(PackingSlip(PackingSlipType.SHIPMENT))
+        if (product.type == ProductType.BOOK) {
+            this.packingSlips.add(PackingSlip(PackingSlipType.ROYALTY))
+        }
     }
 
 }

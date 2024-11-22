@@ -10,8 +10,23 @@ class OrderTest {
 
         order.pay()
 
-        assertEquals(PackingSlip(PackingSlipType.SHIPMENT), order.packingSlip)
+        val expectedPackingSlips = listOf(PackingSlip(PackingSlipType.SHIPMENT))
+        assertEquals(expectedPackingSlips, order.packingSlips)
     }
+
+    @Test
+    fun `payment for a book should generate a duplicate packing slip for royalty`(){
+        val order = Order(Id.random(), Product(Id.random(), ProductType.BOOK))
+
+        order.pay()
+
+        val expectedPackingSlips = listOf(
+            PackingSlip(PackingSlipType.SHIPMENT),
+            PackingSlip(PackingSlipType.ROYALTY),
+        )
+        assertEquals(expectedPackingSlips, order.packingSlips)
+    }
+
 }
 
 
